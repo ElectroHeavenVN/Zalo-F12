@@ -11,6 +11,7 @@ Dùng lệnh sau để kích hoạt Remote Debugger trên ứng dụng Zalo PC:
     ```
     & "$env:localappdata\Programs\Zalo\Zalo.exe" --remote-debugging-port=8315 --remote-allow-origins=*
     ```
+
 Sau đó mở trình duyệt và truy cập `http://localhost:8315`. Bạn sẽ thấy 3 mục như sau:
 
 ![](./Images/1.png)
