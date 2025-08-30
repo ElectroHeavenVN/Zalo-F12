@@ -2,7 +2,7 @@
 Bộ sưu tập code Javascript "paste" vào DevTools để thay đổi cách hoạt động của Zalo Web/PC.
 
 ## Nếu bạn dùng Zalo PC:
-Dùng lệnh sau để mở Remote Debugger trên ứng dụng Zalo PC:
+Dùng lệnh sau để kích hoạt Remote Debugger trên ứng dụng Zalo PC:
 - CMD:
     ```
     %localappdata%\Programs\Zalo\Zalo.exe --remote-debugging-port=8315 --remote-allow-origins=*
