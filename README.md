@@ -28,7 +28,7 @@ Gần như mọi chức năng của Zalo đều có thể được truy cập th
 window.webpackJsonp.push([[Math.random()],{},[["id module"]]])
 ```
 
-ID của các module có thể được tìm thấy rải rác trong tệp `default-embed-web-startup... .js` và thường có độ dài 4 ký tự.
+ID của các module có thể được tìm thấy rải rác trong tệp `zalo-chat-static.zadn.vn/v1/lazy/default-embed-web-startup... .js` và thường có độ dài 4 ký tự.
 
 ```js
 "DOj/": function(t, n, a) { //  <-- ID webpack DOj/
