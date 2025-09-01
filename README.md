@@ -185,3 +185,49 @@ e2ee.default_11_banner.enable = true;
 ![](./Images/11.2.png)
 
 ![](./Images/11.3.png)
+
+### 12. Kích hoạt chế độ nhà phát triển
+
+```js
+window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.adminMode = 1 
+```
+
+![](./Images/12.1.png)
+
+![](./Images/12.2.png)
+ 
+![](./Images/12.3.png)
+
+![](./Images/12.4.png)
+
+![](./Images/12.5.png)
+
+![](./Images/12.6.png)
+
+### 13. Tạo thông báo trên màn hình 
+
+```js
+let delay = 10000;
+window.webpackJsonp.push([[Math.random()],{},[["6uTC"]]]).default.createMessage("nội dung", delay)
+```
+
+![](./Images/13.png)
+
+### 14. Tạo thông báo góc dưới bên trái
+
+```js
+window.webpackJsonp.push([[Math.random()],{},[["6uTC"]]]).default.createMessageCustom({
+    type: 2,    //1 là cảnh báo, 2 là thông tin, 3 là lỗi, 4 là thành công
+    title: 'tiêu đề',
+	description: 'nội dung',
+    duration: 10000,
+    buttons: {  //Có thể có hoặc không
+        primary: {
+            textKey: "OK",
+            onClick: () => {}
+        }
+    }
+})
+```
+
+![](./Images/14.png)
