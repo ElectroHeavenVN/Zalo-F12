@@ -224,10 +224,26 @@ window.webpackJsonp.push([[Math.random()],{},[["6uTC"]]]).default.createMessageC
     buttons: {  //Có thể có hoặc không
         primary: {
             textKey: "OK",
-            onClick: () => {}
+            onClick: () => {}   //Sự kiện nút bấm
         }
     }
 })
 ```
 
 ![](./Images/14.png)
+
+### 15. Tạo thông báo với biểu tượng
+
+```js
+let types = window.webpackJsonp.push([[Math.random()],{},[["Vp9m"]]]).TOAST_TYPE;
+let windowId = '1'; //1 là id cửa sổ chính 
+window.webpackJsonp.push([[Math.random()],{},[["Vp9m"]]]).ZToastManagerHolder.getZToastManagerByWindowId(id).show({
+    noBackground: true, // Có làm mờ toàn bộ màn hình bằng nền không 
+    darkmode: false,    //Hiện thông báo trong chế độ tối bất kể chủ đề hiện tại
+    textKey: 'nội dung thông báo',
+    type: types.INFO,   //Loại thông báo 
+    duration: 5000      //Thời gian hiện thông báo
+})
+```
+
+![](./Images/15.png) 
