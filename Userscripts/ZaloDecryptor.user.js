@@ -8,6 +8,8 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=zalo.me
 // @grant        none
 // @run-at       document-start
+// @updateURL    https://github.com/ElectroHeavenVN/Zalo-F12/raw/refs/heads/main/Userscripts/ZaloDecryptor.user.js
+// @downloadURL  https://github.com/ElectroHeavenVN/Zalo-F12/raw/refs/heads/main/Userscripts/ZaloDecryptor.user.js
 // ==/UserScript==
 
 (function () {
