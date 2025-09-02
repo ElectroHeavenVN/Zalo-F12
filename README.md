@@ -133,7 +133,7 @@ Bạn có thể dùng `JSON.parse` để chuyển đổi chuỗi JSON thành đ�
 ### 7. Bật/tắt chế độ xem ảnh trong cửa sổ popup
 
 ```js
-//Bật là 1, tắt là 0
+// Bật là 1, tắt là 0
 window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.enable_photoviewer_popup = 1
 ```
 
@@ -154,7 +154,7 @@ window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.enable_guggy =
 ```js
 // Kích hoạt embed YouTube
 window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.enable_youtube = 1 
-//Kích hoạt embed SoundCloud
+// Kích hoạt embed SoundCloud
 window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.enable_soundcloud = 1 
 ```
 
@@ -221,10 +221,10 @@ window.webpackJsonp.push([[Math.random()],{},[["6uTC"]]]).default.createMessageC
     title: 'tiêu đề',
 	description: 'nội dung',
     duration: 10000,
-    buttons: {  //Có thể có hoặc không
+    buttons: {  // Có thể có hoặc không
         primary: {
             textKey: "OK",
-            onClick: () => {}   //Sự kiện nút bấm
+            onClick: () => {}   // Sự kiện nút bấm
         }
     }
 })
@@ -236,13 +236,13 @@ window.webpackJsonp.push([[Math.random()],{},[["6uTC"]]]).default.createMessageC
 
 ```js
 let types = window.webpackJsonp.push([[Math.random()],{},[["Vp9m"]]]).TOAST_TYPE;
-let windowId = '1'; //1 là id cửa sổ chính 
+let windowId = '1'; // 1 là id cửa sổ chính 
 window.webpackJsonp.push([[Math.random()],{},[["Vp9m"]]]).ZToastManagerHolder.getZToastManagerByWindowId(id).show({
-    noBackground: true, // Có làm mờ toàn bộ màn hình bằng nền không 
-    darkmode: false,    //Hiện thông báo trong chế độ tối bất kể chủ đề hiện tại
+    noBackground: true, // Không làm mờ toàn bộ màn hình bằng nền
+    darkmode: false,    // Hiện thông báo trong chế độ tối bất kể chủ đề hiện tại
     textKey: 'nội dung thông báo',
-    type: types.INFO,   //Loại thông báo 
-    duration: 5000      //Thời gian hiện thông báo
+    type: types.INFO,   // Loại thông báo 
+    duration: 5000      // Thời gian hiện thông báo
 })
 ```
 
