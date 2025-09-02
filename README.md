@@ -239,7 +239,7 @@ window.webpackJsonp.push([[Math.random()],{},[["6uTC"]]]).default.createMessageC
 ```js
 let types = window.webpackJsonp.push([[Math.random()],{},[["Vp9m"]]]).TOAST_TYPE;
 let windowId = '1'; // 1 là id cửa sổ chính 
-window.webpackJsonp.push([[Math.random()],{},[["Vp9m"]]]).ZToastManagerHolder.getZToastManagerByWindowId(id).show({
+window.webpackJsonp.push([[Math.random()],{},[["Vp9m"]]]).ZToastManagerHolder.getZToastManagerByWindowId(windowId).show({
     noBackground: true, // Không làm mờ toàn bộ màn hình bằng nền
     darkmode: false,    // Hiện thông báo trong chế độ tối bất kể chủ đề hiện tại
     textKey: 'nội dung thông báo',
