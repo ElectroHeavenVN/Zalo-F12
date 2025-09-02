@@ -56,8 +56,10 @@ window.webpackJsonp.push([[Math.random()],{},[["fBUP"]]])
 > Object { default: class ge, … }
 ```
 
-## Code
+## Script
+Các bạn có thể xem mã nguồn và cài các userscript tại thư mục [Userscripts](./Userscripts/).
 
+## Code
 Ok giờ chúng ta sẽ đến phần "copy paste" vào DevTools.
 
 ### 1. Mã hoá/giải mã dữ liệu
@@ -217,7 +219,7 @@ window.webpackJsonp.push([[Math.random()],{},[["6uTC"]]]).default.createMessage(
 
 ```js
 window.webpackJsonp.push([[Math.random()],{},[["6uTC"]]]).default.createMessageCustom({
-    type: 2,    //1 là cảnh báo, 2 là thông tin, 3 là lỗi, 4 là thành công
+    type: 2,    // 1 là cảnh báo, 2 là thông tin, 3 là lỗi, 4 là thành công
     title: 'tiêu đề',
 	description: 'nội dung',
     duration: 10000,
