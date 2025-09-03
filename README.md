@@ -2,7 +2,7 @@
 Bộ sưu tập code Javascript "paste" vào DevTools để thay đổi cách hoạt động của Zalo Web/PC.
 
 ## Nếu bạn dùng Zalo PC:
-Dùng lệnh sau để kích hoạt Remote Debugger trên ứng dụng Zalo PC:
+Dùng lệnh sau để kích hoạt Remote Debugger trên ứng dụng Zalo PC (Cần thoát hoàn toàn ứng dụng Zalo PC trước khi chạy lệnh):
 - CMD:
     ```
     %localappdata%\Programs\Zalo\Zalo.exe --remote-debugging-port=8315 --remote-allow-origins=*
@@ -28,7 +28,9 @@ Gần như mọi chức năng của Zalo đều có thể được truy cập th
 window.webpackJsonp.push([[Math.random()],{},[["id module"]]])
 ```
 
-ID của các module có thể được tìm thấy rải rác trong tệp `zalo-chat-static.zadn.vn/v1/lazy/default-embed-web-startup... .js` và thường có độ dài 4 ký tự.
+ID của các module có thể được tìm thấy rải rác trong tệp `zalo-chat-static.zadn.vn/v1/lazy/default-embed-web-startup... .js` (Web) hoặc `file:///.../resources/app.asar/pc-dist/lazy/default-login-main-startup-shared-worker-znotification... .js` (PC) và thường có độ dài 4 ký tự.
+
+*Lưu ý: Trên phiên bản PC tệp chứa các module có thể thay đổi.*
 
 ```js
 "DOj/": function(t, n, a) { //  <-- ID webpack DOj/
@@ -56,11 +58,12 @@ window.webpackJsonp.push([[Math.random()],{},[["fBUP"]]])
 > Object { default: class ge, … }
 ```
 
-## Script
-Các bạn có thể xem mã nguồn và cài các userscript tại thư mục [Userscripts](./Userscripts/).
-
 ## Code
 Ok giờ chúng ta sẽ đến phần "copy paste" vào DevTools.
+
+<details>
+
+<summary>Mở rộng</summary>
 
 ### 1. Mã hoá/giải mã dữ liệu
 Zalo mã hoá gần như tất cả dữ liệu gửi đi và nhận về và mỗi phiên đăng nhập đều có khoá giải mã riêng. Ta có thể tận dụng hàm mã hoá/giải mã sẵn của Zalo để làm việc này mà không cần biết khoá.
@@ -206,6 +209,8 @@ window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.adminMode = 1
 
 ![](./Images/12.6.png)
 
+Nếu bạn dùng ứng dụng Zalo PC, sau khi kích hoạt chế độ nhà phát triển, bạn nên dùng DevTools của Electron thay vì dùng Remote Debugger bằng cách chọn `biểu tượng bánh răng ở góc dưới bên trái -> Công cụ/Tools -> Common -> DevTools -> Open DevTools`.
+
 ### 13. Tạo thông báo trên màn hình 
 
 ```js
@@ -249,3 +254,8 @@ window.webpackJsonp.push([[Math.random()],{},[["Vp9m"]]]).ZToastManagerHolder.ge
 ```
 
 ![](./Images/15.png) 
+
+</details>
+
+## Script
+Các bạn có thể xem mã nguồn và cài các userscript tại thư mục [Userscripts](./Userscripts/).
