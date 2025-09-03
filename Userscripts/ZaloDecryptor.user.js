@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ZaloDecryptor
 // @namespace    http://tampermonkey.net/
-// @version      1.2.0
+// @version      1.2.1
 // @description  Decrypt and log Zalo's HTTP requests and WebSocket traffics
 // @author       ElectroHeavenVN
 // @match        https://chat.zalo.me/*
@@ -119,6 +119,13 @@
         clear: console.clear.bind(console)
     };
 
+    let enableLog = true;
+
+    window.ZaloDecryptor = {
+        enableLog: () => { enableLog = true; },
+        disableLog: () => { enableLog = false; }
+    };
+
     function debug(name, color, subname, subcolor, content, ...args) {
         myConsole.debug(
             `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c ${content}`,
@@ -210,11 +217,12 @@
         myConsole.log("Installing HTTP hooks...");
         const ZEncoderWebpack = window.webpackJsonp.push([[Math.random()], {}, [["z0WU"]]]);
         const ZHttpWebpack = window.webpackJsonp.push([[Math.random()], {}, [["fBUP"]]]);
-        const ZServiceMapWebpack = window.webpackJsonp.push([[Math.random()],{},[["pUq9"]]]).b;
+        const ZServiceMapWebpack = window.webpackJsonp.push([[Math.random()], {}, [["pUq9"]]]).b;
 
         ZHttpWebpack.default.original__request = ZHttpWebpack.default._request;
         ZHttpWebpack.default._request = (e, url, n, s, o = 0, r = 0, l = false, A = null) => {
             let result = ZHttpWebpack.default.original__request(e, url, n, s, o, r, l, A);
+            if (!enableLog) return result;
             try {
                 if (typeof url === 'object')
                     url = ZServiceMapWebpack.getDomainByType(url.domainType) + url.path;
@@ -229,7 +237,7 @@
                             if (response.config.method)
                                 method = response.config.method.toUpperCase();
                             if (response.config.data) {
-                                if (typeof(response.config.data) === 'string')
+                                if (typeof (response.config.data) === 'string')
                                     encryptedRequestParam = response.config.data.split('params=')[1];
                                 else if (response.config.data instanceof FormData)
                                     uploadData = Array.from(response.config.data.entries());
@@ -304,14 +312,17 @@
             myConsole.log("Installing WebSocket hooks...");
             const ZWSWebpack = window.webpackJsonp.push([[Math.random()], {}, [["8RMw"]]]);
             ZWSWebpack.default.original__onData = ZWSWebpack.default._onData;
-            ZWSWebpack.default._onData = async (opCode, cmd, ver, jsonData) => {
-                let reparsedJsonData = JSON.stringify(JSON.parse(jsonData));    //for displaying Unicode characters
-                debug('WebSocket', 'yellow', 'Receive', 'lime', `\n%cOpcode:%c %c${getOpCodeName(opCode)}%c (%c${opCode}%c), %ccommand:%c ${cmd}, %cversion:%c ${ver}\n%c${reparsedJsonData}`, 'color: cyan', '', 'color: orange', '', 'color: yellow', '', 'color: cyan', '', 'color: cyan', '', 'font-size: 1.15em');
-                return await ZWSWebpack.default.original__onData(opCode, cmd, ver, jsonData);
+            ZWSWebpack.default._onData = (opCode, cmd, ver, jsonData) => {
+                if (enableLog) {
+                    let reparsedJsonData = JSON.stringify(JSON.parse(jsonData));    //for displaying Unicode characters
+                    debug('WebSocket', 'yellow', 'Receive', 'lime', `\n%cOpcode:%c %c${getOpCodeName(opCode)}%c (%c${opCode}%c), %ccommand:%c ${cmd}, %cversion:%c ${ver}\n%c${reparsedJsonData}`, 'color: cyan', '', 'color: orange', '', 'color: yellow', '', 'color: cyan', '', 'color: cyan', '', 'font-size: 1.15em');
+                }
+                return ZWSWebpack.default.original__onData(opCode, cmd, ver, jsonData);
             };
             const originalSend = WebSocket.prototype.send;
             WebSocket.prototype.send = function (data) {
                 originalSend.apply(this, arguments);
+                if (!enableLog) return;
                 let buffer = new Uint8Array(data.byteLength - 4);
                 for (let i = 0; i < data.byteLength - 4; i++) {
                     buffer[i] = data.getInt8(i + 4);
@@ -323,6 +334,7 @@
                 debug('WebSocket', 'yellow', 'Send', 'cyan', `\n%cOpcode:%c %c${getOpCodeName(opCode)}%c (%c${opCode}%c), %ccommand:%c ${cmd}, %cversion:%c ${ver}\n%c${jsonData}`, 'color: cyan', '', 'color: orange', '', 'color: yellow', '', 'color: cyan', '', 'color: cyan', '', 'font-size: 1.15em');
             };
             wsHookInstalled = true;
+            myConsole.info("%cHooks installed. You can turn logging on or off via the window.ZaloDecryptor object.", 'color: yellow; font-size: 1.5em');
         }
     }
 })();
