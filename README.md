@@ -161,9 +161,13 @@ window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.enable_guggy =
 window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.enable_youtube = 1 
 // Kích hoạt embed SoundCloud
 window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.enable_soundcloud = 1 
+// Kích hoạt mục cài đặt
+window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.enable_settings = 1 
 ```
 
-![](./Images/9.png)
+![](./Images/9.1.png)
+
+![](./Images/9.2.png)
 
 ### 10. Kích hoạt chức năng tạo và gửi tệp văn bản 
 
