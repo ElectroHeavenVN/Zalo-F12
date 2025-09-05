@@ -154,13 +154,15 @@ window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.enable_guggy =
 
 ![](./Images/8.2.png)
 
-### 9. Kích hoạt embed YouTube và SoundCloud
+### 9. Kích hoạt embed YouTube, SoundCloud và Zing MP3 trong khung chat
 
 ```js
 // Kích hoạt embed YouTube
 window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.enable_youtube = 1 
 // Kích hoạt embed SoundCloud
 window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.enable_soundcloud = 1 
+// Kích hoạt embed Zing MP3
+window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.mp3_domain = 'https://zingmp3.vn/'
 // Kích hoạt mục cài đặt
 window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.enable_settings = 1 
 ```

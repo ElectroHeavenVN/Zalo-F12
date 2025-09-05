@@ -22,6 +22,7 @@
         ndmk.embed_pop.enable_settings = 1;
         ndmk.embed_pop.enable_soundcloud = 1;
         ndmk.embed_pop.enable_youtube = 1;
+        ndmk.embed_pop.mp3_domain = 'https://zingmp3.vn/';
         ndmk.tfe.enable_edit = 1;
     }, 5000);
 })();

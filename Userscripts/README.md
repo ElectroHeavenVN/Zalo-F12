@@ -10,5 +10,5 @@ Hiện chưa có cách cài đặt các userscript ở thư mục này vào ứn
   - Kích hoạt chế độ nhà phát triển
   - Hiện tùy chọn mã hoá đầu cuối
   - Kích hoạt sticker Guggy
-  - Kích hoạt cài đặt embed YouTube và SoundCloud
+  - Kích hoạt embed YouTube, SoundCloud và Zing MP3
   - Kích hoạt chức năng tạo và gửi tệp văn bản
