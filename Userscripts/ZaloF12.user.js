@@ -20,6 +20,8 @@
         ndmk.e2ee.default_11_banner.enable = true;
         ndmk.enable_guggy = 1;
         ndmk.embed_pop.enable_settings = 1;
+        ndmk.embed_pop.enable_soundcloud = 1;
+        ndmk.embed_pop.enable_youtube = 1;
         ndmk.tfe.enable_edit = 1;
     }, 5000);
 })();
