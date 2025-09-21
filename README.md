@@ -157,6 +157,8 @@ window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.enable_guggy =
 ### 9. Kích hoạt embed YouTube, SoundCloud và Zing MP3 trong khung chat
 
 ```js
+//Xuống cấp phiên bản để kích hoạt lại chức năng embed
+window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.message_bubble.link.version = 2
 // Kích hoạt embed YouTube
 window.webpackJsonp.push([[Math.random()],{},[["NDmK"]]]).default.embed_pop.enable_youtube = 1 
 // Kích hoạt embed SoundCloud

@@ -19,6 +19,7 @@
         ndmk.e2ee.invisible = false;
         ndmk.e2ee.default_11_banner.enable = true;
         ndmk.enable_guggy = 1;
+        ndmk.message_bubble.link.version = 2;
         ndmk.embed_pop.enable_settings = 1;
         ndmk.embed_pop.enable_soundcloud = 1;
         ndmk.embed_pop.enable_youtube = 1;
