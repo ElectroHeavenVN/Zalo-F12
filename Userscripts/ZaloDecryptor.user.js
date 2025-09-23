@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         ZaloDecryptor
 // @namespace    http://tampermonkey.net/
-// @version      1.2.1
+// @version      1.2.2
 // @description  Decrypt and log Zalo's HTTP requests and WebSocket traffics
 // @author       ElectroHeavenVN
 // @match        https://chat.zalo.me/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=zalo.me
-// @grant        none
+// @grant        GM_setValue
+// @grant        GM_getValue
 // @run-at       document-start
 // @updateURL    https://raw.githubusercontent.com/ElectroHeavenVN/Zalo-F12/main/Userscripts/ZaloDecryptor.user.js
 // @downloadURL  https://raw.githubusercontent.com/ElectroHeavenVN/Zalo-F12/main/Userscripts/ZaloDecryptor.user.js
@@ -119,11 +120,36 @@
         clear: console.clear.bind(console)
     };
 
-    let enableLog = true;
+    let enableLog = GM_getValue('enableLog', false);
+    let shouldFormatJSON = GM_getValue('shouldFormatJSON', true);
 
-    window.ZaloDecryptor = {
-        enableLog: () => { enableLog = true; },
-        disableLog: () => { enableLog = false; }
+    unsafeWindow.ZaloDecryptor = {
+        enableLog: () => {
+            enableLog = true;
+            GM_setValue('enableLog', true);
+        },
+        enableFormatJSON: () => {
+            shouldFormatJSON = true;
+            GM_setValue('shouldFormatJSON', true);
+        },
+        disableFormatJSON: () => {
+            shouldFormatJSON = false;
+            GM_setValue('shouldFormatJSON', false);
+        },
+        disableLog: () => {
+            enableLog = false;
+            GM_setValue('enableLog', false);
+        },
+        toggleLog: () => {
+            enableLog = !enableLog;
+            GM_setValue('enableLog', enableLog);
+        },
+        toggleFormatJSON: () => {
+            shouldFormatJSON = !shouldFormatJSON;
+            GM_setValue('shouldFormatJSON', shouldFormatJSON);
+        },
+        getFormatJSONState: () => shouldFormatJSON,
+        getLogState: () => enableLog
     };
 
     function debug(name, color, subname, subcolor, content, ...args) {
@@ -204,8 +230,18 @@
         return findOpCodeName(opcode, KnownOpCodes) || findOpCodeName(opcode, KnownSignalOpCodes) || 'Unknown';
     }
 
+    function formatJSON(json) {
+        if (!shouldFormatJSON)
+            return json;
+        try {
+            return JSON.stringify(JSON.parse(json));
+        } catch (e) { }
+        return json;
+    }
+
     let httpHookInstalled = false;
     let wsHookInstalled = false;
+    let shouldLogInfo = true;
 
     const originalOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
@@ -215,17 +251,32 @@
         httpHookInstalled = true;
         myConsole.clear();
         myConsole.log("Installing HTTP hooks...");
-        const ZEncoderWebpack = window.webpackJsonp.push([[Math.random()], {}, [["z0WU"]]]);
-        const ZHttpWebpack = window.webpackJsonp.push([[Math.random()], {}, [["fBUP"]]]);
-        const ZServiceMapWebpack = window.webpackJsonp.push([[Math.random()], {}, [["pUq9"]]]).b;
+        let interval = setInterval(() => {
+            if (unsafeWindow.webpackJsonp && unsafeWindow.webpackJsonp.push) {
+                clearInterval(interval);
+                installHttpHooks();
+            }
+        }, 100);
+    };
+
+    function installHttpHooks() {
+        const ZEncoderWebpack = unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["z0WU"]]]);
+        const ZHttpWebpack = unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["fBUP"]]]);
+        const ZServiceMapWebpack = unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["pUq9"]]]).b;
 
         ZHttpWebpack.default.original__request = ZHttpWebpack.default._request;
         ZHttpWebpack.default._request = (e, url, n, s, o = 0, r = 0, l = false, A = null) => {
             let result = ZHttpWebpack.default.original__request(e, url, n, s, o, r, l, A);
-            if (!enableLog) return result;
+            if (typeof url === 'object')
+                url = ZServiceMapWebpack.getDomainByType(url.domainType) + url.path;
+            let isLongPolling = url.match(/lp[0-9]-msg\.chat\.zalo\.me/) || url.match(/ws[0-9]-ctl\.chat\.zalo\.me/);
+            if (isLongPolling && shouldLogInfo) {
+                myConsole.info("%cHooks installed. You can turn logging on or off via the window.ZaloDecryptor object.", 'color: yellow; font-size: 1.5em');
+                shouldLogInfo = false;
+            }
+            if (!enableLog)
+                return result;
             try {
-                if (typeof url === 'object')
-                    url = ZServiceMapWebpack.getDomainByType(url.domainType) + url.path;
                 if (!url.includes("api/login/getLoginInfo") && !url.includes("api/login/getServerInfo")) {
                     result.then(response => {
                         try {
@@ -248,10 +299,16 @@
                                 if (encryptedRequestParam)
                                     requestUrl = requestUrl.split('params=')[0] + 'params= ...';
                             }
-                            let requestParam;
-                            if (encryptedRequestParam)
-                                requestParam = ZEncoderWebpack.default.decodeAES(encryptedRequestParam);
-                            else
+                            let requestParam = '';
+                            if (encryptedRequestParam) {
+                                if (!isLongPolling)
+                                    requestParam = ZEncoderWebpack.default.decodeAES(encryptedRequestParam);
+                                else {
+                                    let splitParams = encryptedRequestParam.split(',');
+                                    requestParam = '[Long polling] lastActionId: ' + splitParams[0] + ', lastActionIdOther: ' + splitParams[1] + '\n' + formatJSON(atob(splitParams[2]));
+                                }
+                            }
+                            if (!requestParam || requestParam.length <= 0)
                                 requestParam = '(empty)';
                             let formData = 'Form data:\n%c';
                             if (uploadData) {
@@ -267,29 +324,23 @@
                             }
                             else
                                 formData = '%c%c';
-                            if (response.data.error_code != 0) {
+                            if (typeof(response.data) === "object" && response.data.error_code != 0) {
                                 debug('HTTP', 'orange', 'Error', 'red', `%c${method} %c${requestUrl}\n%cRequest params:\n%c${requestParam}\n%c${formData}%cAPI return error:\n%c${response.data.error_code}%c: ${response.data.error_message}`, 'color: red', 'color: #45a1ff', 'color: orange', 'font-size: 1.15em', 'color: orange', 'color: lime', '', '', 'color: #yellow; font-size: 1.15em', 'font-size: 1.15em');
                                 return;
                             }
-                            let responseData;
-                            let notes = '';
-                            let jsonParseFailed = false;
-                            if (typeof response.data.data === "string") {   //some response is not encrypted and the data become an object, we may log them out
-                                responseData = ZEncoderWebpack.default.decodeAES(response.data.data);
-                                try {
-                                    responseData = JSON.parse(responseData);    //For displaying Unicode characters
-                                }
-                                catch (e) {
-                                    jsonParseFailed = true;
-                                }
+                            let responseData = response.data.data;
+                            if (typeof(response.data) === "string")
+                                responseData = response.data;
+                            let notes = '(not encrypted)';
+                            if (typeof responseData === "string") {
+                                responseData = ZEncoderWebpack.default.decodeAES(responseData);
+                                notes = '';
                             }
-                            else {
-                                responseData = response.data.data;
-                                notes = '(not encrypted)';
-                            }
-                            if (!jsonParseFailed) {
+                            else 
                                 responseData = JSON.stringify(responseData);
-                            }
+                            responseData = formatJSON(responseData);
+                            if (responseData.length <= 0)
+                                responseData = '(empty)';
                             debug('HTTP', 'orange', method, 'cyan', `%c${requestUrl}%c ${notes}\n%cRequest params:\n%c${requestParam}\n%c${formData}%cResponse:\n%c${responseData}`, 'color: #45a1ff', '', 'color: orange', 'font-size: 1.15em', 'color: orange', 'color: lime', '', 'color: orange', 'font-size: 1.15em');
                         }
                         catch (error) {
@@ -303,18 +354,18 @@
             }
             return result;
         }
-    };
+    }
 
     const originalAddEventListener = WebSocket.prototype.addEventListener;
     WebSocket.prototype.addEventListener = function (..._args) {
         originalAddEventListener.apply(this, arguments);
         if (!wsHookInstalled) {
             myConsole.log("Installing WebSocket hooks...");
-            const ZWSWebpack = window.webpackJsonp.push([[Math.random()], {}, [["8RMw"]]]);
+            const ZWSWebpack = unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["8RMw"]]]);
             ZWSWebpack.default.original__onData = ZWSWebpack.default._onData;
             ZWSWebpack.default._onData = (opCode, cmd, ver, jsonData) => {
                 if (enableLog) {
-                    let reparsedJsonData = JSON.stringify(JSON.parse(jsonData));    //for displaying Unicode characters
+                    let reparsedJsonData = formatJSON(jsonData);   
                     debug('WebSocket', 'yellow', 'Receive', 'lime', `\n%cOpcode:%c %c${getOpCodeName(opCode)}%c (%c${opCode}%c), %ccommand:%c ${cmd}, %cversion:%c ${ver}\n%c${reparsedJsonData}`, 'color: cyan', '', 'color: orange', '', 'color: yellow', '', 'color: cyan', '', 'color: cyan', '', 'font-size: 1.15em');
                 }
                 return ZWSWebpack.default.original__onData(opCode, cmd, ver, jsonData);
@@ -327,14 +378,17 @@
                 for (let i = 0; i < data.byteLength - 4; i++) {
                     buffer[i] = data.getInt8(i + 4);
                 }
-                let jsonData = JSON.stringify(JSON.parse(new TextDecoder().decode(buffer)));    //for displaying Unicode characters
+                let jsonData = formatJSON(new TextDecoder().decode(buffer));   
                 let opCode = data.getInt16(1, true);
                 let cmd = data.getInt8(3);
                 let ver = data.getInt8(0);
                 debug('WebSocket', 'yellow', 'Send', 'cyan', `\n%cOpcode:%c %c${getOpCodeName(opCode)}%c (%c${opCode}%c), %ccommand:%c ${cmd}, %cversion:%c ${ver}\n%c${jsonData}`, 'color: cyan', '', 'color: orange', '', 'color: yellow', '', 'color: cyan', '', 'color: cyan', '', 'font-size: 1.15em');
             };
             wsHookInstalled = true;
-            myConsole.info("%cHooks installed. You can turn logging on or off via the window.ZaloDecryptor object.", 'color: yellow; font-size: 1.5em');
+            if (shouldLogInfo) {
+                myConsole.info("%cHooks installed. You can turn logging on or off via the window.ZaloDecryptor object.", 'color: yellow; font-size: 1.5em');
+                shouldLogInfo = false;
+            }
         }
     }
 })();
