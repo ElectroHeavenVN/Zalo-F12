@@ -74,6 +74,7 @@
                 return; // Skip my own messages
             if (message.msgType === 'chat.undo' || message.msgType === 'chat.delete') {
                 let content = Array.isArray(message.content) ? message.content[0] : message.content;
+                let count = Array.isArray(message.content) ? message.content.length : 1;
                 message.quote = {
                     attach: '{"properties":{"color":0,"size":0,"type":0,"subType":0,"ext":"{\\"shouldParseLinkOrContact\\":0}"},"msgBubbleLayoutType":0}',
                     cliMsgId: content.cliMsgId ?? content.clientDelMsgId,
@@ -85,7 +86,10 @@
                     ts: content.cliMsgId ?? content.clientDelMsgId,
                     ttl: 0,
                 };
-                message.content = message.msgType === 'chat.undo' ? 'Message recalled' : 'Message deleted';
+                if (count <= 1) 
+                    message.content = message.msgType === 'chat.undo' ? 'Message recalled' : 'Message deleted';
+                else 
+                    message.content = `${count} ` + (message.msgType === 'chat.undo' ? 'messages recalled' : 'messages deleted');
                 message.msgType = 'webchat';
             }
         }
@@ -127,21 +131,23 @@
                 return payload;
             }
 
-            if (payload.includes('"msgs":[')) {
-                let p = JSON.parse(payload);
-                for (let msg of p.msgs) {
-                    if (Math.abs(Date.now() - parseInt(msg.cliMsgId)) >= 1000 * 60 * 60 * 24) {
-                        msg.cliMsgId = String(Date.now() - 5000);
-                    }
-                }
-                return JSON.stringify(p);
-            }
-            if (payload.includes('"cliMsgIdUndo":"')) {
-                let p = JSON.parse(payload);
-                if (Math.abs(Date.now() - parseInt(p.cliMsgIdUndo)) >= 1000 * 60 * 60 * 24)
-                    p.cliMsgIdUndo = String(Date.now() - 5000);
-                return JSON.stringify(p);
-            }
+            //Anti Anti Delete
+            //No longer works as of September 2025
+            // if (payload.includes('"msgs":[')) {
+            //     let p = JSON.parse(payload);
+            //     for (let msg of p.msgs) {
+            //         if (Math.abs(Date.now() - parseInt(msg.cliMsgId)) >= 1000 * 60 * 60 * 24) {
+            //             msg.cliMsgId = String(Date.now() - 5000);
+            //         }
+            //     }
+            //     return JSON.stringify(p);
+            // }
+            // if (payload.includes('"cliMsgIdUndo":"')) {
+            //     let p = JSON.parse(payload);
+            //     if (Math.abs(Date.now() - parseInt(p.cliMsgIdUndo)) >= 1000 * 60 * 60 * 24)
+            //         p.cliMsgIdUndo = String(Date.now() - 5000);
+            //     return JSON.stringify(p);
+            // }
 
             return payload;
         }
