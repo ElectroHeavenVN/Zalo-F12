@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ZaloDecryptor
 // @namespace    http://tampermonkey.net/
-// @version      1.2.2
+// @version      1.2.3
 // @description  Decrypt and log Zalo's HTTP requests and WebSocket traffics
 // @author       ElectroHeavenVN
 // @match        https://chat.zalo.me/*
@@ -15,6 +15,20 @@
 
 (function () {
     'use strict';
+
+    const _unsafeWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+    const _GM_getValue = typeof GM_getValue !== 'undefined' ? GM_getValue : function(key, defaultValue) {
+        try {
+            const value = localStorage.getItem('ZaloDecryptor_' + key);
+            if (value !== null) return JSON.parse(value);
+        } catch (e) {}
+        return defaultValue;
+    };
+    const _GM_setValue = typeof GM_setValue !== 'undefined' ? GM_setValue : function(key, value) {
+        try {
+            localStorage.setItem('ZaloDecryptor_' + key, JSON.stringify(value));
+        } catch (e) {}
+    };
 
     const KnownOpCodes = {
         AUTHEN: 1,
@@ -43,7 +57,7 @@
         GET_STATUS_MSG: 575,
         GET_STATUS_MSG_GROUP: 576,
         GET_LAST_DELIVER_SEEN: 577,
-        GET_LAST_SEEN_SUB_CHAT_TAB: 578,
+        GET_LAST_SEEN_CHAT_CONTAINER: 578,
         MAX_CONNECTION: 3e3,
         SUBMIT_INTERACTIVE_FILE: 536,
         PULL_LIST_INTERACTIVE_FILE: 537,
@@ -63,7 +77,20 @@
             NEED_VERIFY: 621,
             DONE_MIGRATE: 623
         },
-        GET_IN_APP_PAYMENT_LINK: 701
+        GET_IN_APP_PAYMENT_LINK: 701,
+        GET_MEDIA_UPLOAD_URL: 800,
+        SYNC_MESSAGE: {
+            REQUEST: 590,
+            ACK_DELETE_SYNC_SESSION: 591,
+            REQUEST_MOBILE_WAKE_UP: 592
+        },
+        BACKUP_MSG: {
+            CREATE_SESSION: 631,
+            INIT: 630,
+            GET_METADATA: 632,
+            SIGNAL_RESTORE: 633,
+            GET_CONFIGS: 634
+        }
     };
 
     const KnownSignalOpCodes = {
@@ -120,33 +147,33 @@
         clear: console.clear.bind(console)
     };
 
-    let enableLog = GM_getValue('enableLog', false);
-    let shouldFormatJSON = GM_getValue('shouldFormatJSON', true);
+    let enableLog = _GM_getValue('enableLog', false);
+    let shouldFormatJSON = _GM_getValue('shouldFormatJSON', true);
 
-    unsafeWindow.ZaloDecryptor = {
+    _unsafeWindow.ZaloDecryptor = {
         enableLog: () => {
             enableLog = true;
-            GM_setValue('enableLog', true);
+            _GM_setValue('enableLog', true);
         },
         enableFormatJSON: () => {
             shouldFormatJSON = true;
-            GM_setValue('shouldFormatJSON', true);
+            _GM_setValue('shouldFormatJSON', true);
         },
         disableFormatJSON: () => {
             shouldFormatJSON = false;
-            GM_setValue('shouldFormatJSON', false);
+            _GM_setValue('shouldFormatJSON', false);
         },
         disableLog: () => {
             enableLog = false;
-            GM_setValue('enableLog', false);
+            _GM_setValue('enableLog', false);
         },
         toggleLog: () => {
             enableLog = !enableLog;
-            GM_setValue('enableLog', enableLog);
+            _GM_setValue('enableLog', enableLog);
         },
         toggleFormatJSON: () => {
             shouldFormatJSON = !shouldFormatJSON;
-            GM_setValue('shouldFormatJSON', shouldFormatJSON);
+            _GM_setValue('shouldFormatJSON', shouldFormatJSON);
         },
         getFormatJSONState: () => shouldFormatJSON,
         getLogState: () => enableLog
@@ -252,7 +279,7 @@
         myConsole.clear();
         myConsole.log("Installing HTTP hooks...");
         let interval = setInterval(() => {
-            if (unsafeWindow.webpackJsonp && unsafeWindow.webpackJsonp.push) {
+            if (_unsafeWindow.webpackJsonp && _unsafeWindow.webpackJsonp.push) {
                 clearInterval(interval);
                 installHttpHooks();
             }
@@ -260,9 +287,9 @@
     };
 
     function installHttpHooks() {
-        const ZEncoderWebpack = unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["z0WU"]]]);
-        const ZHttpWebpack = unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["fBUP"]]]);
-        const ZServiceMapWebpack = unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["pUq9"]]]).b;
+        const ZEncoderWebpack = _unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["z0WU"]]]);
+        const ZHttpWebpack = _unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["fBUP"]]]);
+        const ZServiceMapWebpack = _unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["pUq9"]]]).b;
 
         ZHttpWebpack.default.original__request = ZHttpWebpack.default._request;
         ZHttpWebpack.default._request = (e, url, n, s, o = 0, r = 0, l = false, A = null) => {
@@ -361,7 +388,7 @@
         originalAddEventListener.apply(this, arguments);
         if (!wsHookInstalled) {
             myConsole.log("Installing WebSocket hooks...");
-            const ZWSWebpack = unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["8RMw"]]]);
+            const ZWSWebpack = _unsafeWindow.webpackJsonp.push([[Math.random()], {}, [["8RMw"]]]);
             ZWSWebpack.default.original__onData = ZWSWebpack.default._onData;
             ZWSWebpack.default._onData = (opCode, cmd, ver, jsonData) => {
                 if (enableLog) {
