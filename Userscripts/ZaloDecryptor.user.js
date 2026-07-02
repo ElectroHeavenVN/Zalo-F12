@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ZaloDecryptor
 // @namespace    http://tampermonkey.net/
-// @version      1.2.3
+// @version      1.2.4
 // @description  Decrypt and log Zalo's HTTP requests and WebSocket traffics
 // @author       ElectroHeavenVN
 // @match        https://chat.zalo.me/*
@@ -179,9 +179,19 @@
         getLogState: () => enableLog
     };
 
+    function getTimestamp() {
+        const now = new Date();
+        const pad = (n, len = 2) => String(n).padStart(len, '0');
+        const tzOffset = -now.getTimezoneOffset();
+        const tzSign = tzOffset >= 0 ? '+' : '-';
+        const tzH = pad(Math.floor(Math.abs(tzOffset) / 60));
+        const tzM = pad(Math.abs(tzOffset) % 60);
+        return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${tzSign}${tzH}${tzM}`;
+    }
+
     function debug(name, color, subname, subcolor, content, ...args) {
         myConsole.debug(
-            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c ${content}`,
+            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c [${getTimestamp()}] ${content}`,
             `background: linear-gradient(90deg, #0068ff 0%, white 100%); color: black; font-weight: bold; border-radius: 5px;`,
             "",
             `background: ${color}; color: black; font-weight: bold; border-radius: 5px;`,
@@ -193,7 +203,7 @@
 
     function log(name, color, subname, subcolor, content, ...args) {
         myConsole.log(
-            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c ${content}`,
+            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c [${getTimestamp()}] ${content}`,
             `background: linear-gradient(90deg, #0068ff 0%, white 100%); color: black; font-weight: bold; border-radius: 5px;`,
             "",
             `background: ${color}; color: black; font-weight: bold; border-radius: 5px;`,
@@ -205,7 +215,7 @@
 
     function info(name, color, subname, subcolor, content, ...args) {
         myConsole.info(
-            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c ${content}`,
+            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c [${getTimestamp()}] ${content}`,
             `background: linear-gradient(90deg, #0068ff 0%, white 100%); color: black; font-weight: bold; border-radius: 5px;`,
             "",
             `background: ${color}; color: black; font-weight: bold; border-radius: 5px;`,
@@ -217,7 +227,7 @@
 
     function warn(name, color, subname, subcolor, content, ...args) {
         myConsole.warn(
-            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c ${content}`,
+            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c [${getTimestamp()}] ${content}`,
             `background: linear-gradient(90deg, #0068ff 0%, orange 100%); color: black; font-weight: bold; border-radius: 5px;`,
             "",
             `background: ${color}; color: black; font-weight: bold; border-radius: 5px;`,
@@ -229,7 +239,7 @@
 
     function error(name, color, subname, subcolor, content, ...args) {
         myConsole.error(
-            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c ${content}`,
+            `%c ZaloDecryptor %c %c ${name} %c %c ${subname} %c [${getTimestamp()}] ${content}`,
             `background: linear-gradient(90deg, #0068ff 0%, red 100%); color: black; font-weight: bold; border-radius: 5px;`,
             "",
             `background: ${color}; color: black; font-weight: bold; border-radius: 5px;`,
